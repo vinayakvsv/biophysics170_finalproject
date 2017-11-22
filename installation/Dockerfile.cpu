@@ -4,9 +4,9 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /pipinstall_py3.txt
 
 # Set up our notebook config.
-COPY docker/jupyter_notebook_config.py /root/.jupyter/
+COPY python3_config.py /root/.jupyter/
 
-WORKDIR /bph170
+WORKDIR /bphy170
 
 CMD ["/run_jupyter.sh", "--allow-root"] 
 # When running this Docker image, /run_jupyter.sh will be run, starting up a Jupyter link
