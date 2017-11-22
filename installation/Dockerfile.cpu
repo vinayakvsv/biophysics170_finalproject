@@ -1,7 +1,6 @@
-#from the anaconda docker image, we will install libnetcdf
-
+#install the packages presented in pipinstall_py3.txt
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r /pipinstall_py3.txt
+RUN pip install --no-cache-dir -r ./pipinstall_py3.txt
 
 # Set up our notebook config.
 COPY python3_config.py /root/.jupyter/
