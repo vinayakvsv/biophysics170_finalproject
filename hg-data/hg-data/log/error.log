@@ -1,0 +1,2 @@
+2017/08/06 14:09:55 [error] 17#0: *6 open() "/home/higlass/projects/higlass-website/favicon.ico" failed (2: No such file or directory), client: 172.17.0.1, server: , request: "GET /favicon.ico HTTP/1.1", host: "localhost:8888", referrer: "http://localhost:8888/admin/login/?next=/admin/"
+2017/11/27 17:52:03 [error] 14#0: *1 open() "/home/higlass/projects/higlass-website/favicon.ico" failed (2: No such file or directory), client: 172.17.0.1, server: , request: "GET /favicon.ico HTTP/1.1", host: "localhost:8888", referrer: "http://localhost:8888/admin/login/?next=/admin/"

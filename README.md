@@ -23,7 +23,11 @@ Our project aims to answer the following questions
 2. We will be using the Dockerfile image from the 4DN Nucleosome consortium for HiC data. 
 
 ## Notes
-1. Install Cooler: https://github.com/mirnylab/cooler
+1. Remove all existing docker containers:
+```
+https://zaiste.net/posts/removing_docker_containers/
+```
+2. Install Cooler: https://github.com/mirnylab/cooler
     + sudo pip install --ignore-installed six --upgrade cooler (if you have El Capitan or higher for Mac)
     + https://github.com/mirnylab/cooler 
 
