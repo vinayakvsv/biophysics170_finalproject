@@ -22,5 +22,9 @@ Our project aims to answer the following questions
 1. We have a number of python packages to install
 2. We will be using the Dockerfile image from the 4DN Nucleosome consortium for HiC data. 
 
+## Notes
+1. sudo pip install --ignore-installed six --upgrade cooler (if you have El Capitan or higher for Mac)
+2. 
+
 # Analysis Strategy
 *to be added
