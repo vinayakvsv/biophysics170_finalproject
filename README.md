@@ -24,8 +24,8 @@ Our project aims to answer the following questions
 
 ## Notes
 1. Install Cooler: https://github.com/mirnylab/cooler
-  + sudo pip install --ignore-installed six --upgrade cooler (if you have El Capitan or higher for Mac)
-  + https://github.com/mirnylab/cooler 
+    + sudo pip install --ignore-installed six --upgrade cooler (if you have El Capitan or higher for Mac)
+    + https://github.com/mirnylab/cooler 
 
 # Analysis Strategy
 *to be added
