@@ -20,7 +20,9 @@ Our project aims to answer the following questions
 
 # Setup
 1. We have a number of python packages to install
+2. For visualization, we will be running HiGlass from a docker container. See https://github.com/hms-dbmi/higlass/wiki for instructions
 2. We will be using the Dockerfile image from the 4DN Nucleosome consortium for HiC data. 
+
 
 ## Notes
 1. Remove all existing docker containers:

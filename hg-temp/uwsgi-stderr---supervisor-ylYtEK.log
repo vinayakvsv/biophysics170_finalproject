@@ -1,0 +1,39 @@
+/opt/conda/lib/python3.6/site-packages/django/db/models/fields/__init__.py:1451: RuntimeWarning: DateTimeField ViewConf.created received a naive datetime (2017-03-01 18:00:00) while time zone support is active.
+  RuntimeWarning)
+[uWSGI] getting INI configuration from /home/higlass/projects/uwsgi.ini
+open("./python_plugin.so"): No such file or directory [core/utils.c line 3684]
+!!! UNABLE to load uWSGI plugin: ./python_plugin.so: cannot open shared object file: No such file or directory !!!
+*** Starting uWSGI 2.0.14 (64bit) on [Tue Nov 28 06:09:59 2017] ***
+compiled with version: 4.9.2 on 12 November 2017 06:08:23
+os: Linux-4.9.49-moby #1 SMP Wed Sep 27 23:17:17 UTC 2017
+nodename: 8748b1919c15
+machine: x86_64
+clock source: unix
+detected number of CPU cores: 4
+current working directory: /home/higlass/projects/higlass-server
+detected binary path: /opt/conda/bin/uwsgi
+!!! no internal routing support, rebuild with pcre support !!!
+uWSGI running as root, you can use --uid/--gid/--chroot options
+*** WARNING: you are running uWSGI as root !!! (use the --uid flag) *** 
+chdir() to /home/higlass/projects/higlass-server/
+your memory page size is 4096 bytes
+detected max file descriptor number: 1048576
+lock engine: pthread robust mutexes
+thunder lock: disabled (you can enable it with --thunder-lock)
+uwsgi socket 0 bound to UNIX address /home/higlass/projects/app.sock fd 3
+uwsgi socket 1 bound to TCP address :8001 fd 4
+Python version: 3.6.0 |Continuum Analytics, Inc.| (default, Dec 23 2016, 12:22:00)  [GCC 4.4.7 20120313 (Red Hat 4.4.7-1)]
+*** Python threads support is disabled. You can enable it with --enable-threads ***
+Python main interpreter initialized at 0x178c100
+your server socket listen backlog is limited to 100 connections
+your mercy for graceful operations on workers is 60 seconds
+mapped 363840 bytes (355 KB) for 4 cores
+*** Operational MODE: preforking ***
+WSGI app 0 (mountpoint='') ready in 0 seconds on interpreter 0x178c100 pid: 26 (default app)
+*** uWSGI is running in multiple interpreter mode ***
+spawned uWSGI master process (pid: 26)
+spawned uWSGI worker 1 (pid: 28, cores: 1)
+spawned uWSGI worker 2 (pid: 29, cores: 1)
+spawned uWSGI worker 3 (pid: 30, cores: 1)
+spawned uWSGI worker 4 (pid: 31, cores: 1)
+[pid: 28|app: 0|req: 1/1] 172.17.0.1 () {42 vars in 1122 bytes} [Tue Nov 28 06:10:03 2017] GET /api/v1/viewconfs/?d=default => generated 490 bytes in 768 msecs (HTTP/1.1 200) 4 headers in 113 bytes (1 switches on core 0)

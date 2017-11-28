@@ -31,3 +31,4 @@ Traceback (most recent call last):
   File "/opt/conda/lib/python3.6/site-packages/django/db/models/query.py", line 380, in get
     self.model._meta.object_name
 tilesets.models.DoesNotExist: Tileset matching query does not exist.
+[28/Nov/2017 06:10:04] WARNING [django.security.SuspiciousSession:117] Session data corrupted

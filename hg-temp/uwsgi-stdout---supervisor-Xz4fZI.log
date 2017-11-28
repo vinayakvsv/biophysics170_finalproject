@@ -1,0 +1,7 @@
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, fragments, guardian, sessions, tilesets
+Running migrations:
+  No migrations to apply.
+  Your models have changes that are not yet reflected in a migration, and so won't be applied.
+  Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.
+Installed 1 object(s) from 1 fixture(s)
