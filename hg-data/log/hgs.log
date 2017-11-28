@@ -32,3 +32,16 @@ Traceback (most recent call last):
     self.model._meta.object_name
 tilesets.models.DoesNotExist: Tileset matching query does not exist.
 [28/Nov/2017 06:10:04] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:01] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:01] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:08] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:09] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:11] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:11] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:22] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:22] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:12:34] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:55:58] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:56:03] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:56:04] WARNING [django.security.SuspiciousSession:117] Session data corrupted
+[28/Nov/2017 06:56:15] WARNING [django.security.SuspiciousSession:117] Session data corrupted
