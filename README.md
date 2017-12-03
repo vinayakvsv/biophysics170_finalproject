@@ -42,4 +42,5 @@ https://zaiste.net/posts/removing_docker_containers/
 
 HiGlass: https://github.com/hms-dbmi/higlass/wiki
 Cooler: https://github.com/mirnylab/cooler
+Hi-C visualization page: http://promoter.bx.psu.edu/hi-c/view.php
 
