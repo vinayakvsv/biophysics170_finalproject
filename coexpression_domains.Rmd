@@ -11,6 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 # source("http://www.bioconductor.org/biocLite.R")
 # biocLite(c("rtracklayer", "AnnotationHub", "Rsamtools"))
 library(rtracklayer)
+library(stringr)
 ```
 
 # Introduction
@@ -34,13 +35,37 @@ treatment <- c("CTCF-AID","WT-untagged")
 time <- c("untreated","auxin1day","auxin2days","auxin4days","washoff2days")
 rep <- c("rep1","rep2","rep3")
 
-
-
+metacond <- lapply(rnaseqfiles,function(x) {
+  #what treatment
+  treatmentsamp <- as.data.frame(str_locate(x, treatment))
+  rownames(treatmentsamp) <- treatment
+  treatment.match <- rownames(treatmentsamp[complete.cases(treatmentsamp), ])
+  
+  #what time
+  timesamp <- as.data.frame(str_locate(x,time))
+  rownames(timesamp) <- time
+  times.match <- rownames(timesamp[complete.cases(timesamp), ])
+  
+  #what rep
+  repsamp <- as.data.frame(str_locate(x,rep))
+  rownames(repsamp) <- rep
+  reps.match <- rownames(repsamp[complete.cases(repsamp), ])
+  
+  #return
+  conditions <- c(x,treatment.match,times.match,reps.match)
+  names(conditions) <- c("sample","treatment","time","match")
+  conditions
+})
+rnaseq.metada <- t(data.frame(metacond))
+rownames(rnaseq.metada) <- seq_len(nrow(rnaseq.metada))
 ```
 
+```{r}
+print(rnaseq.metada)
+```
 
 ## import genes
 
 ```{r}
-ingenes <- 
+#ingenes <- 
 ```

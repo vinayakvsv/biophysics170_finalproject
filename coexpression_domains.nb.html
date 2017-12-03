@@ -255,22 +255,74 @@ print(rnaseqfiles)</code></pre>
 [23] &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609231_RNA-seq_WT-untagged_auxin2days_rep3_ENC70_tagDensity.bw&quot;
 [24] &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609232_RNA-seq_WT-untagged_auxin4days_rep3_ENC71_tagDensity.bw&quot;</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm5hc2VxX2J3cyA8LSBsYXBwbHkocm5hc2VxZmlsZXMsZnVuY3Rpb24oeCkge1xuICBwcmludChwYXN0ZShcIk5vdyBpbXBvcnRpbmdcIix4KSlcbiAgaW1wb3J0LmJ3KGNvbj14KVxufSlcbmBgYCJ9 -->
-<pre class="r"><code>rnaseq_bws &lt;- lapply(rnaseqfiles,function(x) {
-  print(paste(&quot;Now importing&quot;,x))
-  import.bw(con=x)
-})</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBybmFzZXFfYndzIDwtIGxhcHBseShybmFzZXFmaWxlcyxmdW5jdGlvbih4KSB7XG4jICAgcHJpbnQocGFzdGUoXCJOb3cgaW1wb3J0aW5nXCIseCkpXG4jICAgaW1wb3J0LmJ3KGNvbj14KVxuIyB9KVxuIyBuYW1lcyhybmFzZXFfYndzKSA8LSBybmFzZXFmaWxlc1xuIyB3ZSB3aWxsIHNvcnQgdGhlIG1ldGFkYXRhIGZvciB0aGlzIGZpcnN0LCB0aGVuIHdlIHdpbGwgaW1wb3J0IGluIGEgc21hbGxlciBzY2FsZVxudHJlYXRtZW50IDwtIGMoXCJDVENGLUFJRFwiLFwiV1QtdW50YWdnZWRcIilcbnRpbWUgPC0gYyhcInVudHJlYXRlZFwiLFwiYXV4aW4xZGF5XCIsXCJhdXhpbjJkYXlzXCIsXCJhdXhpbjRkYXlzXCIsXCJ3YXNob2ZmMmRheXNcIilcbnJlcCA8LSBjKFwicmVwMVwiLFwicmVwMlwiLFwicmVwM1wiKVxubWV0YWNvbmQgPC0gbGFwcGx5KHJuYXNlcWZpbGVzLGZ1bmN0aW9uKHgpIHtcbiAgI3doYXQgdHJlYXRtZW50XG4gIHRyZWF0bWVudHNhbXAgPC0gYXMuZGF0YS5mcmFtZShzdHJfbG9jYXRlKHgsIHRyZWF0bWVudCkpXG4gIHJvd25hbWVzKHRyZWF0bWVudHNhbXApIDwtIHRyZWF0bWVudFxuICB0cmVhdG1lbnQubWF0Y2ggPC0gcm93bmFtZXModHJlYXRtZW50c2FtcFtjb21wbGV0ZS5jYXNlcyh0cmVhdG1lbnRzYW1wKSwgXSlcbiAgXG4gICN3aGF0IHRpbWVcbiAgdGltZXNhbXAgPC0gYXMuZGF0YS5mcmFtZShzdHJfbG9jYXRlKHgsdGltZSkpXG4gIHJvd25hbWVzKHRpbWVzYW1wKSA8LSB0aW1lXG4gIHRpbWVzLm1hdGNoIDwtIHJvd25hbWVzKHRpbWVzYW1wW2NvbXBsZXRlLmNhc2VzKHRpbWVzYW1wKSwgXSlcbiAgXG4gICN3aGF0IHJlcFxuICByZXBzYW1wIDwtIGFzLmRhdGEuZnJhbWUoc3RyX2xvY2F0ZSh4LHJlcCkpXG4gIHJvd25hbWVzKHJlcHNhbXApIDwtIHJlcFxuICByZXBzLm1hdGNoIDwtIHJvd25hbWVzKHJlcHNhbXBbY29tcGxldGUuY2FzZXMocmVwc2FtcCksIF0pXG4gIFxuICAjcmV0dXJuXG4gIGNvbmRpdGlvbnMgPC0gYyh4LHRyZWF0bWVudC5tYXRjaCx0aW1lcy5tYXRjaCxyZXBzLm1hdGNoKVxuICBuYW1lcyhjb25kaXRpb25zKSA8LSBjKFwic2FtcGxlXCIsXCJ0cmVhdG1lbnRcIixcInRpbWVcIixcIm1hdGNoXCIpXG4gIGNvbmRpdGlvbnNcbn0pXG5ybmFzZXEubWV0YWRhIDwtIHQoZGF0YS5mcmFtZShtZXRhY29uZCkpXG5yb3duYW1lcyhybmFzZXEubWV0YWRhKSA8LSBzZXFfbGVuKG5yb3cocm5hc2VxLm1ldGFkYSkpXG5gYGAifQ== -->
+<pre class="r"><code># rnaseq_bws &lt;- lapply(rnaseqfiles,function(x) {
+#   print(paste(&quot;Now importing&quot;,x))
+#   import.bw(con=x)
+# })
+# names(rnaseq_bws) &lt;- rnaseqfiles
+# we will sort the metadata for this first, then we will import in a smaller scale
+treatment &lt;- c(&quot;CTCF-AID&quot;,&quot;WT-untagged&quot;)
+time &lt;- c(&quot;untreated&quot;,&quot;auxin1day&quot;,&quot;auxin2days&quot;,&quot;auxin4days&quot;,&quot;washoff2days&quot;)
+rep &lt;- c(&quot;rep1&quot;,&quot;rep2&quot;,&quot;rep3&quot;)
+metacond &lt;- lapply(rnaseqfiles,function(x) {
+  #what treatment
+  treatmentsamp &lt;- as.data.frame(str_locate(x, treatment))
+  rownames(treatmentsamp) &lt;- treatment
+  treatment.match &lt;- rownames(treatmentsamp[complete.cases(treatmentsamp), ])
+  
+  #what time
+  timesamp &lt;- as.data.frame(str_locate(x,time))
+  rownames(timesamp) &lt;- time
+  times.match &lt;- rownames(timesamp[complete.cases(timesamp), ])
+  
+  #what rep
+  repsamp &lt;- as.data.frame(str_locate(x,rep))
+  rownames(repsamp) &lt;- rep
+  reps.match &lt;- rownames(repsamp[complete.cases(repsamp), ])
+  
+  #return
+  conditions &lt;- c(x,treatment.match,times.match,reps.match)
+  names(conditions) &lt;- c(&quot;sample&quot;,&quot;treatment&quot;,&quot;time&quot;,&quot;match&quot;)
+  conditions
+})
+rnaseq.metada &lt;- t(data.frame(metacond))
+rownames(rnaseq.metada) &lt;- seq_len(nrow(rnaseq.metada))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiTm93IGltcG9ydGluZyAvVXNlcnMvdmluYXlha3Zzdi9iaW9waHlzaWNzMTcwL2RhdGEyLy9HU00yNjA5MjA5X1JOQS1zZXFfQ1RDRi1BSURfdW50cmVhdGVkX3JlcDFfRU5SNDhfdGFnRGVuc2l0eS5id1wiXG5bMV0gXCJOb3cgaW1wb3J0aW5nIC9Vc2Vycy92aW5heWFrdnN2L2Jpb3BoeXNpY3MxNzAvZGF0YTIvL0dTTTI2MDkyMTBfUk5BLXNlcV9DVENGLUFJRF9hdXhpbjFkYXlfcmVwMV9FTlI0OV90YWdEZW5zaXR5LmJ3XCJcblsxXSBcIk5vdyBpbXBvcnRpbmcgL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxMV9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMmRheXNfcmVwMV9FTlI1MF90YWdEZW5zaXR5LmJ3XCJcblsxXSBcIk5vdyBpbXBvcnRpbmcgL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxMl9STkEtc2VxX0NUQ0YtQUlEX2F1eGluNGRheXNfcmVwMV9FTlI1MV90YWdEZW5zaXR5LmJ3XCJcblsxXSBcIk5vdyBpbXBvcnRpbmcgL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxM19STkEtc2VxX0NUQ0YtQUlEX3dhc2hvZmYyZGF5c19yZXAxX0VOUjUyX3RhZ0RlbnNpdHkuYndcIlxuWzFdIFwiTm93IGltcG9ydGluZyAvVXNlcnMvdmluYXlha3Zzdi9iaW9waHlzaWNzMTcwL2RhdGEyLy9HU00yNjA5MjE0X1JOQS1zZXFfQ1RDRi1BSURfdW50cmVhdGVkX3JlcDJfRU5SNTNfdGFnRGVuc2l0eS5id1wiXG5bMV0gXCJOb3cgaW1wb3J0aW5nIC9Vc2Vycy92aW5heWFrdnN2L2Jpb3BoeXNpY3MxNzAvZGF0YTIvL0dTTTI2MDkyMTVfUk5BLXNlcV9DVENGLUFJRF9hdXhpbjFkYXlfcmVwMl9FTlI1NF90YWdEZW5zaXR5LmJ3XCJcblsxXSBcIk5vdyBpbXBvcnRpbmcgL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxNl9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMmRheXNfcmVwMl9FTlI1NV90YWdEZW5zaXR5LmJ3XCJcblsxXSBcIk5vdyBpbXBvcnRpbmcgL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxN19STkEtc2VxX0NUQ0YtQUlEX2F1eGluNGRheXNfcmVwMl9FTlI1Nl90YWdEZW5zaXR5LmJ3XCJcbiJ9 -->
-<pre><code>[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609209_RNA-seq_CTCF-AID_untreated_rep1_ENR48_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609210_RNA-seq_CTCF-AID_auxin1day_rep1_ENR49_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609211_RNA-seq_CTCF-AID_auxin2days_rep1_ENR50_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609212_RNA-seq_CTCF-AID_auxin4days_rep1_ENR51_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609213_RNA-seq_CTCF-AID_washoff2days_rep1_ENR52_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609214_RNA-seq_CTCF-AID_untreated_rep2_ENR53_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609215_RNA-seq_CTCF-AID_auxin1day_rep2_ENR54_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609216_RNA-seq_CTCF-AID_auxin2days_rep2_ENR55_tagDensity.bw&quot;
-[1] &quot;Now importing /Users/vinayakvsv/biophysics170/data2//GSM2609217_RNA-seq_CTCF-AID_auxin4days_rep2_ENR56_tagDensity.bw&quot;</code></pre>
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQocm5hc2VxLm1ldGFkYSlcblxuYGBgIn0= -->
+<pre class="r"><code>print(rnaseq.metada)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgc2FtcGxlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdHJlYXRtZW50ICAgICB0aW1lICAgICAgICAgICBtYXRjaCBcbjEgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIwOV9STkEtc2VxX0NUQ0YtQUlEX3VudHJlYXRlZF9yZXAxX0VOUjQ4X3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwidW50cmVhdGVkXCIgICAgXCJyZXAxXCJcbjIgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxMF9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMWRheV9yZXAxX0VOUjQ5X3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4xZGF5XCIgICAgXCJyZXAxXCJcbjMgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxMV9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMmRheXNfcmVwMV9FTlI1MF90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAxXCJcbjQgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxMl9STkEtc2VxX0NUQ0YtQUlEX2F1eGluNGRheXNfcmVwMV9FTlI1MV90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAxXCJcbjUgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxM19STkEtc2VxX0NUQ0YtQUlEX3dhc2hvZmYyZGF5c19yZXAxX0VOUjUyX3RhZ0RlbnNpdHkuYndcIiAgXCJDVENGLUFJRFwiICAgIFwid2FzaG9mZjJkYXlzXCIgXCJyZXAxXCJcbjYgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxNF9STkEtc2VxX0NUQ0YtQUlEX3VudHJlYXRlZF9yZXAyX0VOUjUzX3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwidW50cmVhdGVkXCIgICAgXCJyZXAyXCJcbjcgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxNV9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMWRheV9yZXAyX0VOUjU0X3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4xZGF5XCIgICAgXCJyZXAyXCJcbjggIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxNl9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMmRheXNfcmVwMl9FTlI1NV90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAyXCJcbjkgIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxN19STkEtc2VxX0NUQ0YtQUlEX2F1eGluNGRheXNfcmVwMl9FTlI1Nl90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAyXCJcbjEwIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxOF9STkEtc2VxX0NUQ0YtQUlEX3dhc2hvZmYyZGF5c19yZXAyX0VOUjU3X3RhZ0RlbnNpdHkuYndcIiAgXCJDVENGLUFJRFwiICAgIFwid2FzaG9mZjJkYXlzXCIgXCJyZXAyXCJcbjExIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIxOV9STkEtc2VxX0NUQ0YtQUlEX3VudHJlYXRlZF9yZXAzX0VOUjU4X3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwidW50cmVhdGVkXCIgICAgXCJyZXAzXCJcbjEyIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyMF9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMWRheV9yZXAzX0VOUjU5X3RhZ0RlbnNpdHkuYndcIiAgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4xZGF5XCIgICAgXCJyZXAzXCJcbjEzIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyMV9STkEtc2VxX0NUQ0YtQUlEX2F1eGluMmRheXNfcmVwM19FTlI2MF90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAzXCJcbjE0IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyMl9STkEtc2VxX0NUQ0YtQUlEX2F1eGluNGRheXNfcmVwM19FTlI2MV90YWdEZW5zaXR5LmJ3XCIgICAgXCJDVENGLUFJRFwiICAgIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAzXCJcbjE1IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyM19STkEtc2VxX0NUQ0YtQUlEX3dhc2hvZmYyZGF5c19yZXAzX0VOUjYyX3RhZ0RlbnNpdHkuYndcIiAgXCJDVENGLUFJRFwiICAgIFwid2FzaG9mZjJkYXlzXCIgXCJyZXAzXCJcbjE2IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyNF9STkEtc2VxX1dULXVudGFnZ2VkX3VudHJlYXRlZF9yZXAxX0VOQzYzX3RhZ0RlbnNpdHkuYndcIiAgXCJXVC11bnRhZ2dlZFwiIFwidW50cmVhdGVkXCIgICAgXCJyZXAxXCJcbjE3IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyNV9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluMmRheXNfcmVwMV9FTkM2NF90YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAxXCJcbjE4IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyNl9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluNGRheXNfcmVwMV9FTlI2NV90YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAxXCJcbjE5IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyN19STkEtc2VxX1dULXVudGFnZ2VkX3VudHJlYXRlZF9yZXAyX0VOQzY2X3RhZ0RlbnNpdHkuYndcIiAgXCJXVC11bnRhZ2dlZFwiIFwidW50cmVhdGVkXCIgICAgXCJyZXAyXCJcbjIwIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyOF9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluMmRheXNfcmVwMl9FTlI2N190YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAyXCJcbjIxIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIyOV9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluNGRheXNfcmVwMl9FTlI2OF90YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAyXCJcbjIyIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIzMF9STkEtc2VxX1dULXVudGFnZ2VkX3VudHJlYXRlZF9yZXAzX0VOUjY5X3RhZ0RlbnNpdHkuYndcIiAgXCJXVC11bnRhZ2dlZFwiIFwidW50cmVhdGVkXCIgICAgXCJyZXAzXCJcbjIzIFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIzMV9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluMmRheXNfcmVwM19FTkM3MF90YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW4yZGF5c1wiICAgXCJyZXAzXCJcbjI0IFwiL1VzZXJzL3ZpbmF5YWt2c3YvYmlvcGh5c2ljczE3MC9kYXRhMi8vR1NNMjYwOTIzMl9STkEtc2VxX1dULXVudGFnZ2VkX2F1eGluNGRheXNfcmVwM19FTkM3MV90YWdEZW5zaXR5LmJ3XCIgXCJXVC11bnRhZ2dlZFwiIFwiYXV4aW40ZGF5c1wiICAgXCJyZXAzXCJcbiJ9 -->
+<pre><code>   sample                                                                                                      treatment     time           match 
+1  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609209_RNA-seq_CTCF-AID_untreated_rep1_ENR48_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;untreated&quot;    &quot;rep1&quot;
+2  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609210_RNA-seq_CTCF-AID_auxin1day_rep1_ENR49_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;auxin1day&quot;    &quot;rep1&quot;
+3  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609211_RNA-seq_CTCF-AID_auxin2days_rep1_ENR50_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin2days&quot;   &quot;rep1&quot;
+4  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609212_RNA-seq_CTCF-AID_auxin4days_rep1_ENR51_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin4days&quot;   &quot;rep1&quot;
+5  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609213_RNA-seq_CTCF-AID_washoff2days_rep1_ENR52_tagDensity.bw&quot;  &quot;CTCF-AID&quot;    &quot;washoff2days&quot; &quot;rep1&quot;
+6  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609214_RNA-seq_CTCF-AID_untreated_rep2_ENR53_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;untreated&quot;    &quot;rep2&quot;
+7  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609215_RNA-seq_CTCF-AID_auxin1day_rep2_ENR54_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;auxin1day&quot;    &quot;rep2&quot;
+8  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609216_RNA-seq_CTCF-AID_auxin2days_rep2_ENR55_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin2days&quot;   &quot;rep2&quot;
+9  &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609217_RNA-seq_CTCF-AID_auxin4days_rep2_ENR56_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin4days&quot;   &quot;rep2&quot;
+10 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609218_RNA-seq_CTCF-AID_washoff2days_rep2_ENR57_tagDensity.bw&quot;  &quot;CTCF-AID&quot;    &quot;washoff2days&quot; &quot;rep2&quot;
+11 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609219_RNA-seq_CTCF-AID_untreated_rep3_ENR58_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;untreated&quot;    &quot;rep3&quot;
+12 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609220_RNA-seq_CTCF-AID_auxin1day_rep3_ENR59_tagDensity.bw&quot;     &quot;CTCF-AID&quot;    &quot;auxin1day&quot;    &quot;rep3&quot;
+13 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609221_RNA-seq_CTCF-AID_auxin2days_rep3_ENR60_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin2days&quot;   &quot;rep3&quot;
+14 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609222_RNA-seq_CTCF-AID_auxin4days_rep3_ENR61_tagDensity.bw&quot;    &quot;CTCF-AID&quot;    &quot;auxin4days&quot;   &quot;rep3&quot;
+15 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609223_RNA-seq_CTCF-AID_washoff2days_rep3_ENR62_tagDensity.bw&quot;  &quot;CTCF-AID&quot;    &quot;washoff2days&quot; &quot;rep3&quot;
+16 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609224_RNA-seq_WT-untagged_untreated_rep1_ENC63_tagDensity.bw&quot;  &quot;WT-untagged&quot; &quot;untreated&quot;    &quot;rep1&quot;
+17 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609225_RNA-seq_WT-untagged_auxin2days_rep1_ENC64_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin2days&quot;   &quot;rep1&quot;
+18 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609226_RNA-seq_WT-untagged_auxin4days_rep1_ENR65_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin4days&quot;   &quot;rep1&quot;
+19 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609227_RNA-seq_WT-untagged_untreated_rep2_ENC66_tagDensity.bw&quot;  &quot;WT-untagged&quot; &quot;untreated&quot;    &quot;rep2&quot;
+20 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609228_RNA-seq_WT-untagged_auxin2days_rep2_ENR67_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin2days&quot;   &quot;rep2&quot;
+21 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609229_RNA-seq_WT-untagged_auxin4days_rep2_ENR68_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin4days&quot;   &quot;rep2&quot;
+22 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609230_RNA-seq_WT-untagged_untreated_rep3_ENR69_tagDensity.bw&quot;  &quot;WT-untagged&quot; &quot;untreated&quot;    &quot;rep3&quot;
+23 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609231_RNA-seq_WT-untagged_auxin2days_rep3_ENC70_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin2days&quot;   &quot;rep3&quot;
+24 &quot;/Users/vinayakvsv/biophysics170/data2//GSM2609232_RNA-seq_WT-untagged_auxin4days_rep3_ENC71_tagDensity.bw&quot; &quot;WT-untagged&quot; &quot;auxin4days&quot;   &quot;rep3&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -279,14 +331,14 @@ print(rnaseqfiles)</code></pre>
 <h2>import genes</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5nZW5lcyA8LSBcbmBgYCJ9 -->
-<pre class="r"><code>ingenes &lt;- </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2luZ2VuZXMgPC0gXG5gYGAifQ== -->
+<pre class="r"><code>#ingenes &lt;- </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 </div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FsY3VsYXRlIGNvLWV4cHJlc3Npb24gZG9tYWlucyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ21kK1NoaWZ0K0VudGVyKi4gCgpgYGB7cn0KIyBzb3VyY2UoImh0dHA6Ly93d3cuYmlvY29uZHVjdG9yLm9yZy9iaW9jTGl0ZS5SIikKIyBiaW9jTGl0ZShjKCJydHJhY2tsYXllciIsICJBbm5vdGF0aW9uSHViIiwgIlJzYW10b29scyIpKQpsaWJyYXJ5KHJ0cmFja2xheWVyKQpgYGAKCiMgSW50cm9kdWN0aW9uCgpXZSB3aWxsIGNhbGN1bGF0ZSBjby1leHByZXNzaW9uIGRvbWFpbnMKCgojIyBpbXBvcnQgYmlnd2lncwoKYGBge3J9CnJuYXNlcWZpbGVzIDwtIGxpc3QuZmlsZXMocGF0aCA9ICJ+L2Jpb3BoeXNpY3MxNzAvZGF0YTIvIixwYXR0ZXJuID0gIi4rUk5BLXNlcS4rLmJ3JCIsZnVsbC5uYW1lcyA9IFRSVUUpCnByaW50KHJuYXNlcWZpbGVzKQojIHJuYXNlcV9id3MgPC0gbGFwcGx5KHJuYXNlcWZpbGVzLGZ1bmN0aW9uKHgpIHsKIyAgIHByaW50KHBhc3RlKCJOb3cgaW1wb3J0aW5nIix4KSkKIyAgIGltcG9ydC5idyhjb249eCkKIyB9KQojIG5hbWVzKHJuYXNlcV9id3MpIDwtIHJuYXNlcWZpbGVzCgojIHdlIHdpbGwgc29ydCB0aGUgbWV0YWRhdGEgZm9yIHRoaXMgZmlyc3QsIHRoZW4gd2Ugd2lsbCBpbXBvcnQgaW4gYSBzbWFsbGVyIHNjYWxlCnRyZWF0bWVudCA8LSBjKCJDVENGLUFJRCIsIldULXVudGFnZ2VkIikKdGltZSA8LSBjKCJ1bnRyZWF0ZWQiLCJhdXhpbjFkYXkiLCJhdXhpbjJkYXlzIiwiYXV4aW40ZGF5cyIsIndhc2hvZmYyZGF5cyIpCnJlcCA8LSBjKCJyZXAxIiwicmVwMiIsInJlcDMiKQoKCgpgYGAKCgojIyBpbXBvcnQgZ2VuZXMKCmBgYHtyfQppbmdlbmVzIDwtIApgYGA=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2FsY3VsYXRlIGNvLWV4cHJlc3Npb24gZG9tYWlucyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ21kK1NoaWZ0K0VudGVyKi4gCgpgYGB7cn0KIyBzb3VyY2UoImh0dHA6Ly93d3cuYmlvY29uZHVjdG9yLm9yZy9iaW9jTGl0ZS5SIikKIyBiaW9jTGl0ZShjKCJydHJhY2tsYXllciIsICJBbm5vdGF0aW9uSHViIiwgIlJzYW10b29scyIpKQpsaWJyYXJ5KHJ0cmFja2xheWVyKQpsaWJyYXJ5KHN0cmluZ3IpCmBgYAoKIyBJbnRyb2R1Y3Rpb24KCldlIHdpbGwgY2FsY3VsYXRlIGNvLWV4cHJlc3Npb24gZG9tYWlucwoKCiMjIGltcG9ydCBiaWd3aWdzCgpgYGB7cn0Kcm5hc2VxZmlsZXMgPC0gbGlzdC5maWxlcyhwYXRoID0gIn4vYmlvcGh5c2ljczE3MC9kYXRhMi8iLHBhdHRlcm4gPSAiLitSTkEtc2VxLisuYnckIixmdWxsLm5hbWVzID0gVFJVRSkKcHJpbnQocm5hc2VxZmlsZXMpCiMgcm5hc2VxX2J3cyA8LSBsYXBwbHkocm5hc2VxZmlsZXMsZnVuY3Rpb24oeCkgewojICAgcHJpbnQocGFzdGUoIk5vdyBpbXBvcnRpbmciLHgpKQojICAgaW1wb3J0LmJ3KGNvbj14KQojIH0pCiMgbmFtZXMocm5hc2VxX2J3cykgPC0gcm5hc2VxZmlsZXMKCiMgd2Ugd2lsbCBzb3J0IHRoZSBtZXRhZGF0YSBmb3IgdGhpcyBmaXJzdCwgdGhlbiB3ZSB3aWxsIGltcG9ydCBpbiBhIHNtYWxsZXIgc2NhbGUKdHJlYXRtZW50IDwtIGMoIkNUQ0YtQUlEIiwiV1QtdW50YWdnZWQiKQp0aW1lIDwtIGMoInVudHJlYXRlZCIsImF1eGluMWRheSIsImF1eGluMmRheXMiLCJhdXhpbjRkYXlzIiwid2FzaG9mZjJkYXlzIikKcmVwIDwtIGMoInJlcDEiLCJyZXAyIiwicmVwMyIpCgptZXRhY29uZCA8LSBsYXBwbHkocm5hc2VxZmlsZXMsZnVuY3Rpb24oeCkgewogICN3aGF0IHRyZWF0bWVudAogIHRyZWF0bWVudHNhbXAgPC0gYXMuZGF0YS5mcmFtZShzdHJfbG9jYXRlKHgsIHRyZWF0bWVudCkpCiAgcm93bmFtZXModHJlYXRtZW50c2FtcCkgPC0gdHJlYXRtZW50CiAgdHJlYXRtZW50Lm1hdGNoIDwtIHJvd25hbWVzKHRyZWF0bWVudHNhbXBbY29tcGxldGUuY2FzZXModHJlYXRtZW50c2FtcCksIF0pCiAgCiAgI3doYXQgdGltZQogIHRpbWVzYW1wIDwtIGFzLmRhdGEuZnJhbWUoc3RyX2xvY2F0ZSh4LHRpbWUpKQogIHJvd25hbWVzKHRpbWVzYW1wKSA8LSB0aW1lCiAgdGltZXMubWF0Y2ggPC0gcm93bmFtZXModGltZXNhbXBbY29tcGxldGUuY2FzZXModGltZXNhbXApLCBdKQogIAogICN3aGF0IHJlcAogIHJlcHNhbXAgPC0gYXMuZGF0YS5mcmFtZShzdHJfbG9jYXRlKHgscmVwKSkKICByb3duYW1lcyhyZXBzYW1wKSA8LSByZXAKICByZXBzLm1hdGNoIDwtIHJvd25hbWVzKHJlcHNhbXBbY29tcGxldGUuY2FzZXMocmVwc2FtcCksIF0pCiAgCiAgI3JldHVybgogIGNvbmRpdGlvbnMgPC0gYyh4LHRyZWF0bWVudC5tYXRjaCx0aW1lcy5tYXRjaCxyZXBzLm1hdGNoKQogIG5hbWVzKGNvbmRpdGlvbnMpIDwtIGMoInNhbXBsZSIsInRyZWF0bWVudCIsInRpbWUiLCJtYXRjaCIpCiAgY29uZGl0aW9ucwp9KQpybmFzZXEubWV0YWRhIDwtIHQoZGF0YS5mcmFtZShtZXRhY29uZCkpCnJvd25hbWVzKHJuYXNlcS5tZXRhZGEpIDwtIHNlcV9sZW4obnJvdyhybmFzZXEubWV0YWRhKSkKYGBgCgpgYGB7cn0KcHJpbnQocm5hc2VxLm1ldGFkYSkKYGBgCgojIyBpbXBvcnQgZ2VuZXMKCmBgYHtyfQojaW5nZW5lcyA8LSAKYGBg</div>
 
 
 
