@@ -21,6 +21,6 @@ import cooler
 
 #set the data directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(dir_path,"../data")
+DATA_DIR = os.path.join(dir_path,"../data2")
 print(DATA_DIR)
 

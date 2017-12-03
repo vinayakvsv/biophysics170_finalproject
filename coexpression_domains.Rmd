@@ -1,0 +1,46 @@
+---
+title: "Calculate co-expression domains"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+# source("http://www.bioconductor.org/biocLite.R")
+# biocLite(c("rtracklayer", "AnnotationHub", "Rsamtools"))
+library(rtracklayer)
+```
+
+# Introduction
+
+We will calculate co-expression domains
+
+
+## import bigwigs
+
+```{r}
+rnaseqfiles <- list.files(path = "~/biophysics170/data2/",pattern = ".+RNA-seq.+.bw$",full.names = TRUE)
+print(rnaseqfiles)
+# rnaseq_bws <- lapply(rnaseqfiles,function(x) {
+#   print(paste("Now importing",x))
+#   import.bw(con=x)
+# })
+# names(rnaseq_bws) <- rnaseqfiles
+
+# we will sort the metadata for this first, then we will import in a smaller scale
+treatment <- c("CTCF-AID","WT-untagged")
+time <- c("untreated","auxin1day","auxin2days","auxin4days","washoff2days")
+rep <- c("rep1","rep2","rep3")
+
+
+
+```
+
+
+## import genes
+
+```{r}
+ingenes <- 
+```
