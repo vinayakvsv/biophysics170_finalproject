@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 
 #import basics
@@ -21,6 +21,6 @@ import cooler
 
 #set the data directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_DIR = os.path.join(dir_path,"../data2")
+DATA_DIR = os.path.join(dir_path,"../data")
 print(DATA_DIR)
 

@@ -12,6 +12,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 # biocLite(c("rtracklayer", "AnnotationHub", "Rsamtools"))
 library(rtracklayer)
 library(stringr)
+library(data.table)
 ```
 
 # Introduction
@@ -22,7 +23,7 @@ We will calculate co-expression domains
 ## import bigwigs
 
 ```{r}
-rnaseqfiles <- list.files(path = "~/biophysics170/data2/",pattern = ".+RNA-seq.+.bw$",full.names = TRUE)
+rnaseqfiles <- list.files(path = "~/biophysics170/data/",pattern = ".+RNA-seq.+.bw$",full.names = TRUE)
 print(rnaseqfiles)
 # rnaseq_bws <- lapply(rnaseqfiles,function(x) {
 #   print(paste("Now importing",x))
@@ -35,7 +36,7 @@ treatment <- c("CTCF-AID","WT-untagged")
 time <- c("untreated","auxin1day","auxin2days","auxin4days","washoff2days")
 rep <- c("rep1","rep2","rep3")
 
-metacond <- lapply(rnaseqfiles,function(x) {
+metacond.rnaseq <- lapply(rnaseqfiles,function(x) {
   #what treatment
   treatmentsamp <- as.data.frame(str_locate(x, treatment))
   rownames(treatmentsamp) <- treatment
@@ -53,19 +54,65 @@ metacond <- lapply(rnaseqfiles,function(x) {
   
   #return
   conditions <- c(x,treatment.match,times.match,reps.match)
-  names(conditions) <- c("sample","treatment","time","match")
+  names(conditions) <- c("sampleRNAseq","treatment","time","match")
   conditions
 })
-rnaseq.metada <- t(data.frame(metacond))
-rownames(rnaseq.metada) <- seq_len(nrow(rnaseq.metada))
+rnaseq.metadata <- data.frame(t(data.frame(metacond)))
+rownames(rnaseq.metadata) <- seq_len(nrow(rnaseq.metadata))
 ```
 
 ```{r}
-print(rnaseq.metada)
+print(rnaseq.metadata)
 ```
 
 ## import genes
 
 ```{r}
-#ingenes <- 
+ingenes <- data.frame(fread(input = "./mm-data/mm9.txt"))
+print(ingenes)
+ingenes.granges <- GRanges(seqnames = ingenes[,1],ranges = IRanges(start = ingenes$txStart,end = ingenes$txEnd,names = ingenes$alignID),strand = ingenes$strand)
+print(ingenes.granges)
+#We're not importing mouse for now...
 ```
+
+
+# Calculate co-expression status
+
+Using "WT-untagged,untreated" as the meta condition, we will now attempt to calculate co-expression domains...
+```{r}
+
+test_wt <- subset(rnaseq.metadata,treatment %in% c("WT-untagged") & time %in% c("untreated"))
+print(test_wt)
+
+```
+
+Now, import the three
+```{r}
+import_bw_files <- function(infiles) {
+  outfiles <- lapply(infiles,function(x) {
+    print(paste("Now importing",x))
+    import.bw(con = as.character(x))
+  })
+  names(outfiles) <- infiles
+  return(outfiles)
+}
+```
+
+
+```{r}
+
+wt_bws <- import_bw_files(infiles = test_wt$sample)
+
+```
+
+Intersect with genes
+```{r}
+print(wt_bws$`/Users/vinayakvsv/biophysics170/data2//GSM2609224_RNA-seq_WT-untagged_untreated_rep1_ENC63_tagDensity.bw`)
+```
+
+```{r}
+
+match(x = ingenes.granges,table = wt_bws$`/Users/vinayakvsv/biophysics170/data2//GSM2609224_RNA-seq_WT-untagged_untreated_rep1_ENC63_tagDensity.bw`,ignore.strand=TRUE)
+
+```
+
