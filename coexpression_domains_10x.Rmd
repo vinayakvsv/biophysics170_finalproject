@@ -1,0 +1,17 @@
+---
+title: "Coexpression domains calculated from 10X Genomics Data"
+output: html_notebook
+---
+
+# Introduction
+The link to the data is here: https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/fresh_68k_pbmc_donor_a
+Installation instructions are here: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/rkit 
+
+We are using the 68k PBMCs...
+```{r}
+library(cellrangerRkit)
+```
+
+# import data
+```{r}
+```

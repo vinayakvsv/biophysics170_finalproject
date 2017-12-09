@@ -112,6 +112,7 @@ print(wt_bws$`/Users/vinayakvsv/biophysics170/data2//GSM2609224_RNA-seq_WT-untag
 
 ```{r}
 
+BigWigFile()
 match(x = ingenes.granges,table = wt_bws$`/Users/vinayakvsv/biophysics170/data2//GSM2609224_RNA-seq_WT-untagged_untreated_rep1_ENC63_tagDensity.bw`,ignore.strand=TRUE)
 
 ```

@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 print("hello world")
 
 
-# In[13]:
+# In[ ]:
 
 
 #See https://github.com/mirnylab/cooler-binder/blob/master/cooler_api.ipynb for tutorial
@@ -20,7 +20,7 @@ import sys,os,re
 import cooler
 
 
-# In[3]:
+# In[ ]:
 
 
 get_ipython().magic('matplotlib inline')
@@ -33,13 +33,13 @@ get_ipython().system('curl -O ftp://cooler.csail.mit.edu/coolers/hg19/Rao2014-GM
 get_ipython().system('mv Rao2014-GM12878-MboI-allreps-filtered.5kb.cool ./hic_data/')
 
 
-# In[5]:
+# In[ ]:
 
 
 filepath = './hic_data/Rao2014-GM12878-MboI-allreps-filtered.5kb.cool'
 
 
-# In[6]:
+# In[ ]:
 
 
 c = cooler.Cooler(filepath)
@@ -47,7 +47,7 @@ print(c.info)
 print(c.chroms())
 
 
-# In[14]:
+# In[ ]:
 
 
 mat = c.matrix(balance=False, sparse=True)[1000:1200, 1000:1200]
