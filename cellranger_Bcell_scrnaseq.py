@@ -579,6 +579,129 @@ plt.show()
 
 # ## Map entries onto genomic intervals
 
+# Now, we want to convert the correlation matrix to a "list of contacts" so that we can work with it as a cooler file. 
+
+# ### Isolate the GTF genes that are used
+
+# In[88]:
+
+
+#filtgenes.geneid
+
+
+# In[89]:
+
+
+hg19gtf_genes_filt = hg19gtf_genes[hg19gtf_genes.gene_id.isin(filtgenes.geneid) & hg19gtf_genes.type.isin(["gene"])]
+#filtgenes
+
+
+# In[124]:
+
+
+filtgenes
+
+
+# In[125]:
+
+
+hg19gtf_genes_filt.shape
+
+
+# ### Get the pair-wise listing of intervals and the correlation
+
+# In[126]:
+
+
+#test
+for i in range(len(hg19gtf_genes_filt.index[0:5])):
+    for j in range(len(hg19gtf_genes_filt.index[0:5])):
+        gene1 = hg19gtf_genes_filt.iloc[i,[0,3,4,6]].tolist()
+        gene2 = hg19gtf_genes_filt.iloc[j,[0,3,4,6]].tolist()
+        gene1[0] = "chr"+str(gene1[0])
+        gene2[0] = "chr"+str(gene2[0])
+        corscore = cormat.todense()[i,j]
+        outline = [str(n) for n in gene1+gene2+[corscore]]
+        print("\t".join(outline))
+
+
+# May run faster using https://pandas.pydata.org/pandas-docs/version/0.21/generated/pandas.DataFrame.stack.html
+
+# Whatever output we get, we will have to use pairix or tabix to index the coordinates before making a cooler file
+
+# In[130]:
+
+
+with open("./scrnaseq_10x_bcell_correlation_contacts_100.txt",'w') as outfile:
+#     for i in hg19gtf_genes_filt.index[0:1000]:
+#         for j in hg19gtf_genes_filt.index[0:1000]:
+    for i in range(len(hg19gtf_genes_filt.index[0:10])):
+        for j in range(len(hg19gtf_genes_filt.index[0:10])):
+            if i != j:
+                gene1 = hg19gtf_genes_filt.iloc[i,[0,3,6]].tolist()
+                gene2 = hg19gtf_genes_filt.iloc[j,[0,3,6]].tolist()
+                gene1[0] = "chr"+str(gene1[0])
+                gene2[0] = "chr"+str(gene2[0])
+                #print(i,j)
+                corscore = cormat.todense()[i,j]
+                outline = [str(n) for n in gene1+gene2+[corscore]]
+                #print(i,j,outline)
+                outfile.write("\t".join(outline)+"\n")
+
+
+# In[121]:
+
+
+#hg19gtf_genes_filt
+
+
+# In[117]:
+
+
+#12700
+# hg19gtf_genes_filt.iloc[12700,[0,3,6]].tolist()
+# cormat.todense()[0,12700]
+cormat.shape
+
+
+# In[107]:
+
+
+# def writeout(filename):
+#     with open(filename,'w') as outfile:
+#         for i in hg19gtf_genes_filt.index[0:1000]:
+#             for j in hg19gtf_genes_filt.index[0:1000]:
+#                 gene1 = hg19gtf_genes_filt.iloc[i,[0,3,6]].tolist()
+#                 gene2 = hg19gtf_genes_filt.iloc[j,[0,3,6]].tolist()
+#                 gene1[0] = "chr"+str(gene1[0])
+#                 gene2[0] = "chr"+str(gene2[0])
+#                 corscore = cormat.todense()[i,j]
+#                 outline = [str(n) for n in gene1+gene2+[corscore]]
+#                 outfile.write("\t".join(outline)+"\n")
+#     return(filename)
+
+
+# In[109]:
+
+
+# mp_pool = mp.Pool(4)
+# filenames = mp_pool.map(writeout,["./scrnaseq_10x_bcell_correlation_contacts_1000.txt"])
+mp_pool.close()
+
+
+# In[83]:
+
+
+# for i in range(len(filtgenes.index)):
+#     for 
+
+
+# In[84]:
+
+
+#print([i for i in filtgenes.index])
+
+
 # ## Export matrix
 
 # We want to export the correlation matrix so that we can convert it into a cooler file (and view the results in HiGlass)
@@ -769,3 +892,32 @@ test_corr_nona_sparse.todense()
 # 2. Obtain both the contact scores and the expression correlation of all genes in the genomic bins throughout the slice. 
 # 3. We ultimately want to calculate some "threshold" at which genomic proximity and gene co-expression are potentially significant. 
 # * Weight the signal used to compute correlation by the number of genes present (assign an "uncertainty" to the reads mapping to the genes in the bin)
+
+# In[244]:
+
+
+#test_cooler
+ctest_coexp = cooler.Cooler("./test_out.cool")
+ctest_coexp = cooler.Cooler("./scrnaseq_10x_bcell_correlation_contacts_1000_nonintvl.100kb_bin.cool")
+
+resolution = ctest_coexp.info['bin-size']
+balance_weights = cooler.ice
+mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-1000000')
+print(mat2)
+#probably need a finer resolution
+#mat2 = ctest_coexp.matrix().fetch()
+#mat2 = ctest_coexp.matrix()
+
+
+# In[170]:
+
+
+#mat2 = ctest_coexp.matrix(as_pixels=False,balance=False).fetch('chr1:1-15,000,000')
+
+
+# In[245]:
+
+
+plt.matshow(mat2, cmap='YlOrRd')
+plt.show()
+
