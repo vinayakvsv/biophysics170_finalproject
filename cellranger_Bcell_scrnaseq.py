@@ -4,7 +4,7 @@
 # # Introduction
 # This notebook loads in analysis of B-cells isolated from PBMC's from a healthy donor and analyzed on the 10X Genomics platform. Data was downloaded from the 10X website (https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/fresh_68k_pbmc_donor_a). Instructions on using the ``matrix.mtx`` files are included here: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/output/matrices. We will follow this tutorial
 
-# In[202]:
+# In[1]:
 
 
 # import necessary packages
@@ -21,6 +21,7 @@ import h5py
 import cooler
 import re
 import seaborn
+import scipy.spatial.distance as ds
 
 
 # In[2]:
@@ -41,13 +42,7 @@ tsne_dir = os.path.join(bcell_analysis_dir,"tsne")
 kmeans_dir = os.path.join(bcell_analysis_dir,"kmeans")
 
 
-# In[1]:
-
-
-print(mat.shape)
-
-
-# In[3]:
+# In[4]:
 
 
 #set import functions
@@ -67,7 +62,7 @@ def import_matrix_mtx_file(filename,aspd=False):
 #     return(ids,names)
 
 
-# In[4]:
+# In[5]:
 
 
 #import the file. Use multiprocessing to make this run smoother
@@ -77,15 +72,16 @@ genes_path = os.path.join(bcell_matrix_dir, "genes.tsv")
 barcodes_path = os.path.join(bcell_matrix_dir, "barcodes.tsv")
 
 
-# In[5]:
+# In[6]:
 
 
+#impor the matrix file
 mp_pool = mp.Pool(5)
 infile = mp_pool.map(import_matrix_mtx_file, [inmatrix])
 mp_pool.close()
 
 
-# In[6]:
+# In[7]:
 
 
 mat = infile[0]
@@ -95,51 +91,33 @@ print(mat)
 #rows are genes, columns are cells!
 
 
-# In[ ]:
-
-
-#import numpy as np  
-# A = mat
-#C=((A.T*A -(sum(A).T*sum(A)/N))/(N-1)).todense()
-#V=np.sqrt(np.mat(np.diag(C)).T*np.mat(np.diag(C)))
-#COV = np.divide(C,V+1e-119)
-
-
-# In[ ]:
-
-
-#attempts at h5py
-
-#attempt to save as an h5py file
-
-#mat.to_hdf(os.path.join(bcell_matrix_dir, "matrix.h5"), 'sparse_df')
-
-# with h5py.File(os.path.join(bcell_matrix_dir, "matrix.h5"), 'w') as hf:
-#     hf.create_dataset("bcell_8k",  data=mat)
-
-#filepath = os.path.join(bcell_matrix_dir, "matrix.h5")
-# filepath = os.path.join(bcell_matrix_dir, "matrix.h5")
-# print(filepath)
-# store1 = pd.HDFStore(os.path.join(bcell_matrix_dir, "matrix.h5"))
-
-
-# import h5py
-# h5 = h5py.File(filepath="../scrnaseq_10x/bcells/", 'r')
-
-# import cooler
-# cooler.matrix()
-
-
-# #attempt to load
-# with h5py.File(os.path.join(bcell_matrix_dir, "matrix.h5"), 'r') as hf:
-#     indata = hf['bcell_8k'][:]
-
-
-# In[ ]:
-
-
-#len(np.sum(a=indata,axis=0))
-
+# ```
+# #attempts at h5py
+# 
+# #attempt to save as an h5py file
+# 
+# #mat.to_hdf(os.path.join(bcell_matrix_dir, "matrix.h5"), 'sparse_df')
+# 
+# # with h5py.File(os.path.join(bcell_matrix_dir, "matrix.h5"), 'w') as hf:
+# #     hf.create_dataset("bcell_8k",  data=mat)
+# 
+# #filepath = os.path.join(bcell_matrix_dir, "matrix.h5")
+# # filepath = os.path.join(bcell_matrix_dir, "matrix.h5")
+# # print(filepath)
+# # store1 = pd.HDFStore(os.path.join(bcell_matrix_dir, "matrix.h5"))
+# 
+# 
+# # import h5py
+# # h5 = h5py.File(filepath="../scrnaseq_10x/bcells/", 'r')
+# 
+# # import cooler
+# # cooler.matrix()
+# 
+# 
+# # #attempt to load
+# # with h5py.File(os.path.join(bcell_matrix_dir, "matrix.h5"), 'r') as hf:
+# #     indata = hf['bcell_8k'][:]
+# ```
 
 # # Tiling the transcriptome
 # 
@@ -150,7 +128,7 @@ print(mat)
 # 3. We will then calculate the correlation matrix for the cell-bin matrix such that we correlate the transcriptional outputs of bin 1 with bin 2. We then save this as a "contact map" of sorts and output it to a file
 # 4. We then convert the matrix into a Cooler file (using the 100-kb bins from earlier) and work it up in Ccooler or Hi-Glass
 
-# In[12]:
+# In[8]:
 
 
 # load the gene IDs and names
@@ -158,38 +136,29 @@ gene_ids = [row[0] for row in csv.reader(open(genes_path), delimiter="\t")]
 gene_names = [row[1] for row in csv.reader(open(genes_path), delimiter="\t")]
 
 
-# In[13]:
+# In[9]:
 
 
 # load the barcode IDs
 barcodes = [row[0] for row in csv.reader(open(barcodes_path), delimiter="\t")]
 
 
-# In[14]:
+# In[10]:
 
 
 genes_df = pd.DataFrame()
 genes_df = genes_df.assign(genename=pd.Series(gene_names),geneid=pd.Series(gene_ids))
 
 
-# In[ ]:
-
-
 # for multi-core jobs
 # https://stackoverflow.com/questions/33480675/multiprocessing-on-a-set-number-of-cores
 
-
 # ## Import ENSEMBL GTF
 
-# In[ ]:
+# In[11]:
 
 
 #set ensembl file
-
-
-# In[7]:
-
-
 #scrnaseq_dir = "../scrnaseq_10x/"
 hg19gtf = "../hg19ref/refdata-cellranger-hg19-1.2.0/genes/genes.gtf"
 hg19gtf_dir = os.path.join(scrnaseq_dir,hg19gtf)
@@ -197,19 +166,19 @@ hg19gtf_dir = os.path.join(scrnaseq_dir,hg19gtf)
 hg19gtf_genes = pd.read_csv(hg19gtf,delimiter="\t",comment="#",header=None)
 
 
-# In[8]:
+# In[12]:
 
 
 hg19gtf_genes.columns = ["chr","database","type","start","end","other","strand","other2","metadata"]
 
 
-# In[10]:
+# In[13]:
 
 
 metadata = hg19gtf_genes.metadata.apply(lambda x: re.split(r"[a-zA-Z]+_[a-zA-Z]+ \"|\";",x)[1])
 
 
-# In[16]:
+# In[14]:
 
 
 hg19gtf_genes['gene_id'] = pd.Series(metadata)
@@ -233,7 +202,7 @@ print(hg19gtf_genes_expression.shape)
 
 # We now load T-SNE metadata for this population. We will show what the populations look like and then isolate the cells responsible to generate co-expression blocks
 
-# In[17]:
+# In[15]:
 
 
 #tsne_data = scipy.io.mmread(os.path.join(tsne_dir, "projection.csv")) 
@@ -243,7 +212,7 @@ tsne_meta = pd.DataFrame(tsne_points[1:])
 tsne_meta.columns = tsne_points[0]
 
 
-# In[18]:
+# In[16]:
 
 
 #import clustering
@@ -255,7 +224,7 @@ cluster_10_ids = pd.read_csv(os.path.join(cluster_10,"clusters.csv"))
 #kmeans_10 = os.path.join(pca_dir,"10_clusters") 
 
 
-# In[19]:
+# In[17]:
 
 
 plt.figure(figsize=(10, 10))
@@ -279,7 +248,7 @@ plt.show()
 #     cellgroups[i-1] = scipy.sparse.coo_matrix(mat_csr[:,cells_ind.tolist()]) #cells_ind  
 
 
-# In[20]:
+# In[19]:
 
 
 # def get_cluster(clusterid,cellmat,cluster_ids):
@@ -298,7 +267,7 @@ def get_cluster(clusterid,celldf,cluster_ids):
 #    return(scipy.sparse.coo_matrix(mat_csr[:,cells_ind.tolist()]))
 
 
-# In[21]:
+# In[20]:
 
 
 mp_pool = mp.Pool(4)
@@ -307,26 +276,16 @@ cellgroups = mp_pool.starmap(get_cluster, clusters)
 mp_pool.close()
 
 
-# In[25]:
+# In[21]:
 
 
 mat1 = cellgroups[0]
 print(type(mat1))
 
 
-# In[ ]:
+# ## Calcuate co-ex
 
-
-# Calcuate co-ex
-
-
-# In[26]:
-
-
-import scipy.spatial.distance as ds
-
-
-# In[103]:
+# In[22]:
 
 
 def calculate_sparsemat_correlation(sparsemat):
@@ -347,37 +306,37 @@ def calculate_sparsemat_correlation(sparsemat):
     return C#coeffs
 
 
-# In[127]:
+# In[ ]:
 
 
-from scipy.sparse import random
-from scipy import stats
-class CustomRandomState(object):
-    def randint(self, k):
-        i = np.random.randint(k)
-        return i - i % 2
-rs = CustomRandomState()
-rvs = stats.poisson(2, loc=1).rvs
-S = random(1000, 10000, density=0.25, random_state=rs, data_rvs=rvs)
-print(S.A)
-print(np.corrcoef(S.A))
+# from scipy.sparse import random
+# from scipy import stats
+# class CustomRandomState(object):
+#     def randint(self, k):
+#         i = np.random.randint(k)
+#         return i - i % 2
+# rs = CustomRandomState()
+# rvs = stats.poisson(2, loc=1).rvs
+# S = random(1000, 10000, density=0.25, random_state=rs, data_rvs=rvs)
+# print(S.A)
+# print(np.corrcoef(S.A))
 
 
 # In[ ]:
 
 
-def calculate_corr(pd_df):
-    return pd_df.T.corr(method="pearson") #pearson is default
+# def calculate_corr(pd_df):
+#     return pd_df.T.corr(method="pearson") #pearson is default
 
 
-# In[27]:
+# In[23]:
 
 
 for i in cellgroups:
     print(i.shape)
 
 
-# In[28]:
+# In[24]:
 
 
 #keey the clusters that have more than 'ncell' cells
@@ -402,7 +361,7 @@ for i in [j for j in cellgroups_keep]:
 # https://stackoverflow.com/questions/34872854/how-to-ignore-zeros-when-calculating-correlations-between-columns-for-sparse-mat
 
 
-# In[30]:
+# In[25]:
 
 
 mat1 = cellgroups_keep[0]
@@ -418,7 +377,7 @@ print(mat1.shape)
 # 
 # The counts are rather sparse for a given set of cells. Most of the genes have 0 counts across all of the cells. See below
 
-# In[143]:
+# In[26]:
 
 
 plt.hist(np.log10(np.sum(mat1,axis=1)+1),bins=1000,density=True)
@@ -431,7 +390,7 @@ plt.show()
 
 # First, we will remove genes from the matrix that have zero-sum across all of the cells (since such genes have an "indeterminate" status across the cells
 
-# In[182]:
+# In[27]:
 
 
 mat1_sumxcells = np.sum(mat1,axis=1)
@@ -441,14 +400,106 @@ mask = genes_df.index.isin(zerogenes_ind)
 nonzero_genes = genes_df[~mask]
 
 
+# In[29]:
+
+
+nonzero_genes.shape
+
+
 # Now, we compute the pairwise correlation of genes
 
-# In[184]:
+# In[36]:
 
 
-#print(type(mat1_sumxcells))
-mat1_nonzerogenes = mat1.todense()[zerogenes_ind,:]
-mat1_nonzerogenes_sparse = sps.coo_matrix(np.corrcoef(mat1_nonzerogenes))
+def filter_genes(imat,ingenes):
+    #first, remove genes that have zero sums all throughout the cells
+    mat1_sumxcells = np.sum(mat1,axis=1)
+    zerogenes_ind = np.where(mat1_sumxcells != mat1_sumxcells.min())[0].tolist()
+
+    mask = ingenes.index.isin(zerogenes_ind)
+    nonzero_genes = genes_df[~mask]
+
+    return(nonzero_genes)
+
+def calculate_correlation_matrices(inmat,ingenes):
+    #first, remove genes that have zero sums all throughout the cells
+    mat1_sumxcells = np.sum(mat1,axis=1)
+    zerogenes_ind = np.where(mat1_sumxcells != mat1_sumxcells.min())[0].tolist()
+
+    mask = ingenes.index.isin(zerogenes_ind)
+    nonzero_genes = genes_df[~mask]
+    
+    mat1_nonzerogenes = mat1.todense()[zerogenes_ind,:]
+    mat1_nonzerogenes_sparse = sps.coo_matrix(np.corrcoef(mat1_nonzerogenes))
+    
+    return(mat1_nonzerogenes_sparse)
+
+
+# In[ ]:
+
+
+# #print(type(mat1_sumxcells))
+# mat1_nonzerogenes = mat1.todense()[zerogenes_ind,:]
+# mat1_nonzerogenes_sparse = sps.coo_matrix(np.corrcoef(mat1_nonzerogenes))
+
+
+# In[57]:
+
+
+mp_pool.close()
+
+
+# In[43]:
+
+
+mp_pool = mp.Pool(4)
+inputmats = [(i,genes_df) for i in cellgroups_keep]
+#print(inputmats)
+filtgenes = mp_pool.starmap(filter_genes,inputmats)
+#cormats = mp_pool.starmap(calculate_correlation_matrices,inputmats)
+mp_pool.close()
+
+
+# In[52]:
+
+
+for i in cellgroups_keep:
+    print(i)
+
+
+# In[45]:
+
+
+#mp_pool = mp.Pool(4)
+#cormats = mp_pool.starmap_async(calculate_correlation_matrices,inputmats)
+mp_pool.close()
+
+
+# In[47]:
+
+
+cormats = []
+for i in inputmats:
+    cormats.append(calculate_correlation_matrices(i[0],i[1]))
+
+
+# In[53]:
+
+
+for i in cormats:
+    print(i.shape)
+
+
+# In[51]:
+
+
+cormats[0].todense()
+
+
+# In[50]:
+
+
+cormats[1].todense()
 
 
 # We can also perform a distance calculation
@@ -465,30 +516,72 @@ d = ds.pdist(mat1_nonzerogenes_sparse.todense(), 'correlation')
 print(d)
 
 
-# In[191]:
+# In[ ]:
 
 
 print(mat1_nonzerogenes_sparse.todense())
 
 
-# In[201]:
+# In[54]:
 
 
-seaborn.heatmap(mat1_nonzerogenes_sparse.todense()[0:1000,0:1000])
+# for i in cormats:
+# #     seaborn.heatmap(mat1_nonzerogenes_sparse.todense()[0:1000,0:1000])
+#     seaborn.heatmap(i.todense())
+#     plt.xticks([])
+#     plt.yticks([])
+#     plt.show()
+# #plt.plot(mat1_nonzerogenes_sparse.todense()[0:100][0:100])
+# #plt.show()
+
+
+# ## Correlation for all cells
+
+# In[59]:
+
+
+# inputmats = [(mat,genes_df)] # for i in cellgroups_keep]
+
+
+# mp_pool = mp.Pool(4)
+# filtgenes = mp_pool.starmap(filter_genes,inputmats)
+# cormats = mp_pool.starmap(calculate_correlation_matrices,inputmats)
+# mp_pool.close()
+
+filtgenes = filter_genes(imat=mat,ingenes=genes_df)
+cormat = calculate_correlation_matrices(ingenes=genes_df,inmat=mat)
+
+# mat
+
+
+# In[61]:
+
+
+cormat.shape
+
+
+# In[75]:
+
+
+cormat.todense()
+
+
+# We'll use this matrix
+
+# In[79]:
+
+
+seaborn.heatmap(cormat.todense()[0:2000,0:2000])
 plt.xticks([])
 plt.yticks([])
 plt.show()
-#plt.plot(mat1_nonzerogenes_sparse.todense()[0:100][0:100])
-#plt.show()
 
+
+# ## Map entries onto genomic intervals
 
 # ## Export matrix
 
-# In[ ]:
-
-
-We want to export the correlation matrix so that we can convert it into a cooler file (and view the results )
-
+# We want to export the correlation matrix so that we can convert it into a cooler file (and view the results in HiGlass)
 
 # ## Other approaches
 
@@ -504,7 +597,7 @@ We want to export the correlation matrix so that we can convert it into a cooler
 
 # ### Outdated: correlations with the full set (TOO LONG!)
 
-# In[104]:
+# In[ ]:
 
 
 # convert in a numpy array
@@ -516,13 +609,13 @@ m1 = m + 1e-119 #add an infinitesmal to pseudocount
 sparsecorr = calculate_sparsemat_correlation(m1)
 
 
-# In[107]:
+# In[ ]:
 
 
 scipy.sparse.random()
 
 
-# In[102]:
+# In[ ]:
 
 
 d = ds.pdist(m[1:100,1:100], 'correlation')
