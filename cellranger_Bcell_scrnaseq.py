@@ -22,6 +22,7 @@ import cooler
 import re
 import seaborn
 import scipy.spatial.distance as ds
+import time
 
 
 # In[2]:
@@ -185,7 +186,7 @@ print(hg19gtf_genes_expression.shape)
 
 # We now load T-SNE metadata for this population. We will show what the populations look like and then isolate the cells responsible to generate co-expression blocks
 
-# In[14]:
+# In[ ]:
 
 
 #tsne_data = scipy.io.mmread(os.path.join(tsne_dir, "projection.csv")) 
@@ -195,7 +196,7 @@ tsne_meta = pd.DataFrame(tsne_points[1:])
 tsne_meta.columns = tsne_points[0]
 
 
-# In[15]:
+# In[ ]:
 
 
 #import clustering
@@ -207,7 +208,7 @@ cluster_10_ids = pd.read_csv(os.path.join(cluster_10,"clusters.csv"))
 #kmeans_10 = os.path.join(pca_dir,"10_clusters") 
 
 
-# In[16]:
+# In[ ]:
 
 
 plt.figure(figsize=(10, 10))
@@ -228,7 +229,7 @@ plt.yticks([float(min(ylist))-1, float(max(ylist))+1])
 plt.show()
 
 
-# In[17]:
+# In[ ]:
 
 
 xlist = tsne_meta.iloc[:,1].tolist()
@@ -262,7 +263,7 @@ plt.show()
 # 
 # The counts are rather sparse for a given set of cells. Most of the genes have 0 counts across all of the cells. See below
 
-# In[18]:
+# In[53]:
 
 
 plt.hist(np.log10(np.sum(mat,axis=1)+1),bins=50,density=True)
@@ -280,7 +281,7 @@ plt.show()
 
 # Now, we compute the pairwise correlation of genes
 
-# In[26]:
+# In[54]:
 
 
 def filter_genes(inmat,ingenes):
@@ -317,7 +318,7 @@ def calculate_correlation_matrices(ingenes,inmat=mat):
 
 # ## Correlation for all cells
 
-# In[21]:
+# In[60]:
 
 
 # inputmats = [(mat,genes_df)] # for i in cellgroups_keep]
@@ -334,7 +335,7 @@ print(filtgenes.shape)
 # mat
 
 
-# In[32]:
+# In[55]:
 
 
 mp_pool = mp.Pool(5)
@@ -343,13 +344,13 @@ cormat_nonzerogenes = mp_pool.map(calculate_correlation_matrices,[genes_df])
 mp_pool.close()
 
 
-# In[33]:
+# In[56]:
 
 
 cormat = cormat_nonzerogenes[0]
 
 
-# In[35]:
+# In[57]:
 
 
 print(cormat.shape)
@@ -358,7 +359,7 @@ print(cormat)
 
 # We'll use this matrix
 
-# In[41]:
+# In[58]:
 
 
 seaborn.heatmap(cormat[1600:1700,1600:1700])
@@ -373,14 +374,14 @@ plt.show()
 
 # ### Isolate the GTF genes that are used
 
-# In[42]:
+# In[61]:
 
 
 hg19gtf_genes_filt = hg19gtf_genes[hg19gtf_genes.gene_id.isin(filtgenes.geneid) & hg19gtf_genes.type.isin(["gene"])]
 #filtgenes
 
 
-# In[44]:
+# In[62]:
 
 
 #re-index the filtgenes to match the indexing of the cormat
@@ -394,7 +395,7 @@ hg19gtf_genes_filt.index =  range(cormat.shape[0])
 #hg19gtf_genes_filt
 
 
-# In[45]:
+# In[63]:
 
 
 hg19gtf_genes_filt.shape
@@ -402,7 +403,7 @@ hg19gtf_genes_filt.shape
 
 # ### Get the pair-wise listing of intervals and the correlation
 
-# In[64]:
+# In[ ]:
 
 
 #test
@@ -431,13 +432,16 @@ for i in hg19gtf_genes_filt.index[0:100]:
 #         print("\t".join(outline))
 
 
-# In[81]:
+# In[64]:
 
 
-def create_coexp_pairmap (nlines):
+def create_coexp_pairmap (inds):
     a = []
-    for i in hg19gtf_genes_filt.index[0:nlines]:
-        for j in hg19gtf_genes_filt.index[0:nlines]:
+    startind = inds[0]
+    endind = inds[1]
+    
+    for i in hg19gtf_genes_filt.index[startind:endind]:
+        for j in hg19gtf_genes_filt.index[startind:endind]:
             gene1 = hg19gtf_genes_filt.iloc[i,[0,3,6]].tolist()
     #         gene1 = hg19gtf_genes_filt.iloc[i,[0,3,4,6]].tolist()
             gene2 = hg19gtf_genes_filt.iloc[j,[0,3,6]].tolist()
@@ -450,40 +454,159 @@ def create_coexp_pairmap (nlines):
     return(a)
 
 
-# In[98]:
+# In[65]:
+
+
+def create_coexp_pairmap_chunks (genelist):
+    a = []
+    for i in genelist.index:
+        for j in genelist.index:
+            print(i,j)
+            gene1 = genelist.iloc[i,[0,3,6]].tolist()
+            gene2 = genelist.iloc[j,[0,3,6]].tolist()
+
+            gene1[0] = "chr"+str(gene1[0])
+            gene2[0] = "chr"+str(gene2[0])
+            
+            corscore = cormat[i,j]
+            
+            outline = [str(n) for n in gene1+gene2+[corscore]]
+            
+            a.append("\t".join(outline)+"\n")
+    return(a)
+
+
+# In[ ]:
 
 
 # print(hg19gtf_genes_filt.shape)
+
+
+# In[96]:
+
+
+n = 2000
+chunks = [hg19gtf_genes_filt.iloc[i:i+n] for i in range(2000,len(hg19gtf_genes_filt.index[2000:]),n)]
+print(chunks)
+
+
+# In[ ]:
+
+
+# chunks[0]
 
 
 # In[ ]:
 
 
 mp_pool = mp.Pool(5)
-matrices_10k = mp_pool.map(create_coexp_pairmap,[10000])
+# matrices_2000_chunks = mp_pool.map(create_coexp_pairmap_chunks,chunks[0:2])
+matrices_2000_3000 = mp_pool.map(create_coexp_pairmap,[3000])
 mp_pool.close()
 
 
-# In[86]:
+# In[99]:
 
 
-matrices[0][0:10]
+#chunks = [(i,i+n) for i in range(2000,len(hg19gtf_genes_filt.index[2000:]),n)]
+#generate chunks
+chunks = [] 
+n = 1000
+startind = 0
+for i in range(startind,len(hg19gtf_genes_filt.index),n):
+#     print(i)
+    if i+n < len(hg19gtf_genes_filt.index[startind:]):
+        chunks.append((i,i+n))
+    else:
+        nlen = len(hg19gtf_genes_filt.index[startind:])
+        chunks.append((i,nlen))
+print(chunks)
 
 
-# In[87]:
+# In[103]:
 
 
-def write_to_file(entries,filename="./test_pairwisemat_10kx10k.txt"):
+chunks[10:]
+
+
+# In[139]:
+
+
+#chunking
+# takes 563.3457841873169 seconds for a single run on the 6 threads
+npool = 4
+mp_pool = mp.Pool(npool)
+# matrices_2000_chunks = mp_pool.map(create_coexp_pairmap_chunks,chunks[0:2])
+# matrices_chunks = mp_pool.map(create_coexp_pairmap,chunks[0:2])
+d = time.time()
+# matrices_chunks_ind3_7 = mp_pool.map(create_coexp_pairmap,chunks)
+matrices_chunks_1000on = mp_pool.map(create_coexp_pairmap,chunks[10:])
+d1 = time.time() - d
+mp_pool.close()
+print("Took: %f seconds with %d threads"%(d1,npool))
+
+
+# In[115]:
+
+
+mp_pool.close()
+
+
+# In[140]:
+
+
+#matrices_chunks_ind2[0][0:10]
+for i in matrices_chunks_1000on:
+    print(i[0:10])
+
+
+# In[ ]:
+
+
+# matrices_chunks_ind3_7_joined = ''.join(matrices_chunks_ind3_7)
+
+
+# In[141]:
+
+
+def write_to_file(entries,filename="./test_pairwisemat_5000_to_6000.txt"):
+    with open(filename,'w') as outfile:
+        for i in entries:
+            outfile.write(i)
+# matrices_chunks_ind3_7
+def write_to_file_mult(filename,entries):
     with open(filename,'w') as outfile:
         for i in entries:
             outfile.write(i)
 
 
-# In[88]:
+# In[142]:
 
 
-mp_pool = mp.Pool(5)
-outmatrices = mp_pool.map(write_to_file,matrices)
+# mp_pool = mp.Pool(5)
+filenames = []
+for i in chunks[10:]:
+    filename = "./test_pairwisemat_"+str(i[0])+"_to_"+str(i[1])+".txt"
+    filenames.append(filename)
+print(filenames)
+# outmatrices = mp_pool.map(write_to_file,[matrices_chunks_ind2[0]])
+# mp_pool.close()
+
+
+# In[85]:
+
+
+# print(cormat.shape)
+
+
+# In[143]:
+
+
+mp_pool = mp.Pool(4)
+# outmatrices = mp_pool.map(write_to_file,[matrices_chunks_ind2[0]])
+# outmatrices = mp_pool.starmap(write_to_file_mult,[(filenames[0],matrices_chunks_ind3_7[0])])
+for i in range(len(filenames)):
+    outmatrices = mp_pool.starmap(write_to_file_mult,[(filenames[i],matrices_chunks_1000on[i])])
 mp_pool.close()
 
 
@@ -729,16 +852,16 @@ mp_pool.close()
 # 3. We ultimately want to calculate some "threshold" at which genomic proximity and gene co-expression are potentially significant. 
 # * Weight the signal used to compute correlation by the number of genes present (assign an "uncertainty" to the reads mapping to the genes in the bin)
 
-# In[96]:
+# In[156]:
 
 
 #test_cooler
 #ctest_coexp = cooler.Cooler("./cooler_files/test_out.cool")
-ctest_coexp = cooler.Cooler("./test_pairwisemat_1000x1000.20kb.sorted.cool")
+ctest_coexp = cooler.Cooler("./bcell_8k/test_pairwisemat_0_to_15858.20kb_sorted.cool")
 
 resolution = ctest_coexp.info['bin-size']
 balance_weights = cooler.ice
-mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-10,000,000')
+mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-20,000,000')
 print(mat2)
 #probably need a finer resolution
 #mat2 = ctest_coexp.matrix().fetch()
@@ -746,6 +869,12 @@ print(mat2)
 
 
 # In[ ]:
+
+
+# for a figure, show plots 
+
+
+# In[157]:
 
 
 ctest_coexp.info
@@ -757,14 +886,14 @@ ctest_coexp.info
 #mat2 = ctest_coexp.matrix(as_pixels=False,balance=False).fetch('chr1:1-15,000,000')
 
 
-# In[97]:
+# In[158]:
 
 
 plt.matshow(mat2, cmap='YlOrRd')
 plt.show()
 
 
-# In[93]:
+# In[159]:
 
 
 # ctest_hic = cooler.Cooler("../data/coolfiles/GSM2644945_Untreated-R1.20000.cool")
@@ -772,12 +901,58 @@ ctest_hic = cooler.Cooler("./hic_data/Rao2014-GM12878-MboI-allreps-filtered.5kb.
 print(ctest_hic.info['bin-size'])
 #balance_weights = cooler.ice
 print(ctest_hic.info)
-mat_hic_untreated = ctest_hic.matrix(balance=True).fetch('chr1:1-10,000,000')
+mat_hic_untreated = ctest_hic.matrix(balance=True).fetch('chr1:1-20,000,000')
 plt.matshow(mat_hic_untreated, cmap='YlOrRd')
 plt.show()
 
 
 # Clearly, we cannot compare the two matrices unless we consider regions mutual to both the Hi-C file and the coexpression matrix. But, this would make for an good introductory figure. 
+
+# ## Showing the whole-transcriptome co-expression matrix
+
+# In[162]:
+
+
+# import the chromosome sizes file
+chrsizes = pd.read_csv("./hg-data/hg19.chrom.sizes",header=None,delimiter="\t")
+chrsizes
+
+
+# In[167]:
+
+
+coexp_ranges = []
+for i in chrsizes.index[0:24]:
+    chrrange = chrsizes.iloc[i,0] + ":1-"+str(chrsizes.iloc[i,1])
+    coexp_ranges.append(chrrange)
+
+
+# In[176]:
+
+
+bcell_cooler_mats = []
+
+cooler_coexp_100kb = cooler.Cooler("./bcell_8k/test_pairwisemat_0_to_15858.100kb_sorted.cool")
+
+print(len(coexp_ranges))
+ncols = 4
+fig, axes = plt.subplots(12, 2)
+
+for row in axes:
+    print(row)
+# for i,j in zip(coexp_ranges,coexp_ranges[1:]):
+#     mat_i = cooler_coexp_100kb.matrix(balance=False).fetch(i)
+#     mat_j = cooler_coexp_100kb.matrix(balance=False).fetch(j)
+#     bcell_cooler_mats.append(mat_i)
+#     bcell_cooler_mats.append(mat_j)
+#     plt.matshow(mat_i, cmap='YlOrRd')
+#     plt.title(i+"\n")
+#     plt.show()
+#resolution = ctest_coexp.info['bin-size']
+# balance_weights = cooler.ice
+# mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-20,000,000')
+# print(mat2)
+
 
 # # OUTDATED Components
 # At some point, we will delete the below sections
