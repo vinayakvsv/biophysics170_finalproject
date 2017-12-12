@@ -44,3 +44,7 @@ HiGlass: https://github.com/hms-dbmi/higlass/wiki
 Cooler: https://github.com/mirnylab/cooler
 Hi-C visualization page: http://promoter.bx.psu.edu/hi-c/view.php
 
+# Parallelization
+
+We use multiprocessing package. However, some of these jobs will have to be run on Orchestra (for example, generating the correlation map of the B-cell co-expression data)
+
