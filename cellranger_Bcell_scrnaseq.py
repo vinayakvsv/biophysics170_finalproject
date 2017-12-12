@@ -280,7 +280,7 @@ plt.show()
 
 # Now, we compute the pairwise correlation of genes
 
-# In[19]:
+# In[26]:
 
 
 def filter_genes(inmat,ingenes):
@@ -300,7 +300,7 @@ def filter_genes(inmat,ingenes):
 # print(genes_df.shape)
 # print(mat.shape)
 
-def calculate_correlation_matrices(inmat,ingenes):
+def calculate_correlation_matrices(ingenes,inmat=mat):
     #first, remove genes that have zero sums all throughout the cells
     mat1_sumxcells = np.sum(inmat,axis=1)
     nonzerogenes_ind = np.where(mat1_sumxcells != mat1_sumxcells.min())[0].tolist()
@@ -310,9 +310,9 @@ def calculate_correlation_matrices(inmat,ingenes):
     nonzero_genes = genes_df[mask]
     
     mat1_nonzerogenes = inmat.todense()[nonzerogenes_ind,:]
-    mat1_nonzerogenes_sparse = sps.coo_matrix(np.corrcoef(mat1_nonzerogenes))
+    mat1_nonzerogenes_corr = np.corrcoef(mat1_nonzerogenes)
     
-    return(mat1_nonzerogenes_sparse)
+    return(mat1_nonzerogenes_corr)
 
 
 # ## Correlation for all cells
@@ -334,32 +334,34 @@ print(filtgenes.shape)
 # mat
 
 
-# In[ ]:
+# In[32]:
 
 
 mp_pool = mp.Pool(5)
-cormat = mp_pool.starmap(calculate_correlation_matrices,[genes_df,mat])
+# cormat = mp_pool.starmap(calculate_correlation_matrices,[genes_df,mat])
+cormat_nonzerogenes = mp_pool.map(calculate_correlation_matrices,[genes_df])
 mp_pool.close()
 
 
-# In[ ]:
+# In[33]:
 
 
-cormat.shape
+cormat = cormat_nonzerogenes[0]
 
 
-# In[ ]:
+# In[35]:
 
 
-cormat.todense()
+print(cormat.shape)
+print(cormat)
 
 
 # We'll use this matrix
 
-# In[ ]:
+# In[41]:
 
 
-seaborn.heatmap(cormat.todense()[0:2000,0:2000])
+seaborn.heatmap(cormat[1600:1700,1600:1700])
 plt.xticks([])
 plt.yticks([])
 plt.show()
@@ -371,20 +373,14 @@ plt.show()
 
 # ### Isolate the GTF genes that are used
 
-# In[ ]:
-
-
-#filtgenes.geneid
-
-
-# In[ ]:
+# In[42]:
 
 
 hg19gtf_genes_filt = hg19gtf_genes[hg19gtf_genes.gene_id.isin(filtgenes.geneid) & hg19gtf_genes.type.isin(["gene"])]
 #filtgenes
 
 
-# In[ ]:
+# In[44]:
 
 
 #re-index the filtgenes to match the indexing of the cormat
@@ -398,7 +394,7 @@ hg19gtf_genes_filt.index =  range(cormat.shape[0])
 #hg19gtf_genes_filt
 
 
-# In[ ]:
+# In[45]:
 
 
 hg19gtf_genes_filt.shape
@@ -406,20 +402,23 @@ hg19gtf_genes_filt.shape
 
 # ### Get the pair-wise listing of intervals and the correlation
 
-# In[ ]:
+# In[64]:
 
 
 #test
 
-for i in hg19gtf_genes_filt.index[0:5]:
-    for j in hg19gtf_genes_filt.index[0:5]:
-        gene1 = hg19gtf_genes_filt.iloc[i,[0,3,4,6]].tolist()
-        gene2 = hg19gtf_genes_filt.iloc[j,[0,3,4,6]].tolist()
+a = []
+for i in hg19gtf_genes_filt.index[0:100]:
+    for j in hg19gtf_genes_filt.index[0:100]:
+        gene1 = hg19gtf_genes_filt.iloc[i,[0,3,6]].tolist()
+#         gene1 = hg19gtf_genes_filt.iloc[i,[0,3,4,6]].tolist()
+        gene2 = hg19gtf_genes_filt.iloc[j,[0,3,6]].tolist()
+#         gene2 = hg19gtf_genes_filt.iloc[j,[0,3,4,6]].tolist()
         gene1[0] = "chr"+str(gene1[0])
         gene2[0] = "chr"+str(gene2[0])
-        corscore = cormat.todense()[i,j]
+        corscore = cormat[i,j]
         outline = [str(n) for n in gene1+gene2+[corscore]]
-        print("\t".join(outline))
+        a.append("\t".join(outline)+"\n")
 
 # for i in range(len(hg19gtf_genes_filt.index[0:5])):
 #     for j in range(len(hg19gtf_genes_filt.index[0:5])):
@@ -430,6 +429,62 @@ for i in hg19gtf_genes_filt.index[0:5]:
 #         corscore = cormat.todense()[i,j]
 #         outline = [str(n) for n in gene1+gene2+[corscore]]
 #         print("\t".join(outline))
+
+
+# In[81]:
+
+
+def create_coexp_pairmap (nlines):
+    a = []
+    for i in hg19gtf_genes_filt.index[0:nlines]:
+        for j in hg19gtf_genes_filt.index[0:nlines]:
+            gene1 = hg19gtf_genes_filt.iloc[i,[0,3,6]].tolist()
+    #         gene1 = hg19gtf_genes_filt.iloc[i,[0,3,4,6]].tolist()
+            gene2 = hg19gtf_genes_filt.iloc[j,[0,3,6]].tolist()
+    #         gene2 = hg19gtf_genes_filt.iloc[j,[0,3,4,6]].tolist()
+            gene1[0] = "chr"+str(gene1[0])
+            gene2[0] = "chr"+str(gene2[0])
+            corscore = cormat[i,j]
+            outline = [str(n) for n in gene1+gene2+[corscore]]
+            a.append("\t".join(outline)+"\n")
+    return(a)
+
+
+# In[98]:
+
+
+# print(hg19gtf_genes_filt.shape)
+
+
+# In[ ]:
+
+
+mp_pool = mp.Pool(5)
+matrices_10k = mp_pool.map(create_coexp_pairmap,[10000])
+mp_pool.close()
+
+
+# In[86]:
+
+
+matrices[0][0:10]
+
+
+# In[87]:
+
+
+def write_to_file(entries,filename="./test_pairwisemat_10kx10k.txt"):
+    with open(filename,'w') as outfile:
+        for i in entries:
+            outfile.write(i)
+
+
+# In[88]:
+
+
+mp_pool = mp.Pool(5)
+outmatrices = mp_pool.map(write_to_file,matrices)
+mp_pool.close()
 
 
 # May run faster using https://pandas.pydata.org/pandas-docs/version/0.21/generated/pandas.DataFrame.stack.html. If we want to print out 12,500 x 12,500 = ~ 150 million entries rapidly, we will need to either run this on a computing cluster (Orchestra) or utilize some clever strategy
@@ -674,16 +729,16 @@ mp_pool.close()
 # 3. We ultimately want to calculate some "threshold" at which genomic proximity and gene co-expression are potentially significant. 
 # * Weight the signal used to compute correlation by the number of genes present (assign an "uncertainty" to the reads mapping to the genes in the bin)
 
-# In[ ]:
+# In[96]:
 
 
 #test_cooler
 #ctest_coexp = cooler.Cooler("./cooler_files/test_out.cool")
-ctest_coexp = cooler.Cooler("./cooler_files/scrnaseq_10x_bcell_correlation_contacts_1000_5kb_bin.cool")
+ctest_coexp = cooler.Cooler("./test_pairwisemat_1000x1000.20kb.sorted.cool")
 
 resolution = ctest_coexp.info['bin-size']
 balance_weights = cooler.ice
-mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-1,000,000')
+mat2 = ctest_coexp.matrix(balance=False).fetch('chr1:1-10,000,000')
 print(mat2)
 #probably need a finer resolution
 #mat2 = ctest_coexp.matrix().fetch()
@@ -702,14 +757,14 @@ ctest_coexp.info
 #mat2 = ctest_coexp.matrix(as_pixels=False,balance=False).fetch('chr1:1-15,000,000')
 
 
-# In[ ]:
+# In[97]:
 
 
 plt.matshow(mat2, cmap='YlOrRd')
 plt.show()
 
 
-# In[ ]:
+# In[93]:
 
 
 # ctest_hic = cooler.Cooler("../data/coolfiles/GSM2644945_Untreated-R1.20000.cool")
@@ -717,7 +772,7 @@ ctest_hic = cooler.Cooler("./hic_data/Rao2014-GM12878-MboI-allreps-filtered.5kb.
 print(ctest_hic.info['bin-size'])
 #balance_weights = cooler.ice
 print(ctest_hic.info)
-mat_hic_untreated = ctest_hic.matrix(balance=True).fetch('chr1:1-1,000,000')
+mat_hic_untreated = ctest_hic.matrix(balance=True).fetch('chr1:1-10,000,000')
 plt.matshow(mat_hic_untreated, cmap='YlOrRd')
 plt.show()
 

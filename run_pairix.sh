@@ -1,0 +1,2 @@
+bgzip scrnaseq_10x_bcell_correlation_contacts_1000_nonrep.txt
+pairix -p pairs scrnaseq_10x_bcell_correlation_contacts_1000_nonrep.txt.gz
